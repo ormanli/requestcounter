@@ -1,0 +1,4 @@
+apiVersion: v2
+name: requestcounter
+type: application
+version: 0.1.0

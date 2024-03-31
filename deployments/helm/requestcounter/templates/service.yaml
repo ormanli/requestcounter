@@ -1,0 +1,21 @@
+{{- range $service, $val := .Values.services }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $service }}
+  labels:
+    app: {{ $service }}
+spec:
+  {{ if (hasKey $val.service "type") }}
+  type: {{ $val.service.type }}
+  {{ end }}
+  sessionAffinity: None
+  ports:
+    - port: {{ $val.service.port }}
+      targetPort: {{ $val.service.port }}
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ $service }}
+{{- end }}

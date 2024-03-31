@@ -1,0 +1,9 @@
+with-expecter: true
+disable-version-string: true
+filename: "mock_{{.InterfaceNameLower}}_test.go"
+packages:
+  github.com/ormanli/requestcounter/internal/app/requestcounter:
+    config:
+      dir: "internal/app/requestcounter"
+    interfaces:
+      Counter:

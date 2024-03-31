@@ -1,0 +1,33 @@
+services:
+  redis:
+    replicaCount: 1
+    image:
+      repository: redis
+      pullPolicy: IfNotPresent
+      tag: "7-alpine"
+    service:
+      type: ClusterIP
+      port: 6379
+  request-counter:
+    replicaCount: 3
+    image:
+      repository: request-counter
+      pullPolicy: IfNotPresent
+      tag: "1.0.0"
+    service:
+      type: LoadBalancer
+      port: 8083
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 8083
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8083
+    env:
+      APP_REDIS_HOST: redis
+      APP_REDIS_PORT: 6379
+      APP_REDIS_COUNTER_KEY: cluster_count
+      APP_SERVER_PORT: 8083
+      APP_INIT_DEBUG: true

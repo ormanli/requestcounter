@@ -1,0 +1,48 @@
+{{- range $service, $val := .Values.services }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $service }}
+  labels:
+    app: {{ $service }}
+spec:
+  replicas: {{ $val.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ $service }}
+  template:
+    metadata:
+      labels:
+        app: {{ $service }}
+    spec:
+      containers:
+        - name: {{ $service }}
+          image: "{{ $val.image.repository }}:{{ $val.image.tag }}"
+          imagePullPolicy: {{$val.image.pullPolicy}}
+          {{ if (hasKey $val "env") }}
+          env:
+          {{- range $env_key, $env_val := $val.env }}
+            - name: {{ $env_key }}
+              value: {{ $env_val | quote }}
+          {{- end }}
+          {{ end }}
+          ports:
+            - containerPort: {{$val.service.port}}
+          {{ if (hasKey $val "readinessProbe") }}
+          readinessProbe:
+            httpGet:
+              path: {{ $val.readinessProbe.httpGet.path }}
+              port: {{ $val.readinessProbe.httpGet.port }}
+            initialDelaySeconds: 1
+            periodSeconds: 5
+          {{ end }}
+          {{ if (hasKey $val "livenessProbe") }}
+          livenessProbe:
+            httpGet:
+              path: {{ $val.livenessProbe.httpGet.path }}
+              port: {{ $val.livenessProbe.httpGet.port }}
+            initialDelaySeconds: 1
+            periodSeconds: 5
+          {{ end }}
+{{- end }}
